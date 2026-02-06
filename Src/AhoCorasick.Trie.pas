@@ -271,17 +271,20 @@ procedure TTrie.ClearParseResult;
 var
   I: Integer;
 begin
-  if FAllowOverlaps then
-  begin
-    for I := 0 to FParses.Count - 1 do
-      FParses[I].Free;
-  end
-  else
-  begin
-    if Assigned(FItlTree) then
-      FItlTree.Free;
+  TMonitor.Enter(FParses);
+  try
+    if FAllowOverlaps then begin
+      for I := 0 to FParses.Count - 1 do
+        FParses[I].Free;
+    end
+    else begin
+      if Assigned(FItlTree) then
+        FItlTree.Free;
+    end;
+    FParses.Clear;
+  finally
+    TMonitor.Exit(FParses);
   end;
-  FParses.Clear;
 end;
 
 procedure TTrie.CLearTokenResult;
